@@ -8,7 +8,7 @@ extension Project {
                     platform: .iOS,
                     product: .app,
                     bundleId: "com.demoapp",
-                    infoPlist: InfoPlist(extendedGraphemeClusterLiteral:folder),
+                    infoPlist: InfoPlist.file(path: "Base/Resources/Info.plist"),
                     sources: ["Base/Core/**","Base/Features/**","\(folder)/Sources/ViewController.swift"],
                     resources: ["Base/Resources/**","\(folder)/Resources/**"]
                     ),
