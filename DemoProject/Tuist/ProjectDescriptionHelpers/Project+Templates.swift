@@ -15,7 +15,7 @@ extension Project {
         Target(name: "\(folder)Tests",
                     platform: .iOS,
                     product: .unitTests,
-                    bundleId: "com.obssa.demoapptests",
+                    bundleId: "com.demoapptests",
                     infoPlist: "Base/Tests/Info.plist",
                     sources: ["Base/Tests/**"],
                     dependencies: [
