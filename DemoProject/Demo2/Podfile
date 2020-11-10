@@ -1,0 +1,63 @@
+
+source 'https://cdn.cocoapods.org/'
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+platform :ios, '11.0'
+
+# Do not display warning for Pods
+inhibit_all_warnings!
+
+#Indicate project specific configuration for debug and release
+project 'Demo2','Debug DEV' => :debug, 'Debug ITG' => :debug, 'Debug PROD' => :debug, 'Debug PRP' => :debug, 'Release DEV' => :release, 'Release ITG' => :release, 'Release PROD' => :release, 'Release PRP' => :release
+
+target 'Demo2' do
+  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
+  use_frameworks!
+  pod 'OrangeTrustBadge'
+
+    # Pods for App
+    pod 'R.swift'
+
+  target 'Demo2Tests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end
+post_install do |installer|
+
+  # This removes the warning about swift conversion, hopefuly forever!
+  puts "Post-Install: Removes the warning about swift conversion"
+  installer.pods_project.root_object.attributes['LastSwiftMigration'] = 9999
+  installer.pods_project.root_object.attributes['LastSwiftUpdateCheck'] = 9999
+  installer.pods_project.root_object.attributes['LastUpgradeCheck'] = 1200
+
+  puts "Post-Install: Patch ENABLE_BITCODE"
+  # Disable bitcode for now.
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+    end
+  end
+
+  puts "Post-Install: Add flag -DPHOTOS and -DCAMERA for OrangeTrustBadge"
+  # Add specific flag for OrangeTrustBadge
+  installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+          config.build_settings['OTHER_SWIFT_FLAGS'] ||= ['$(inherited)']
+          config.build_settings['OTHER_SWIFT_FLAGS'] << '-DPHOTOS'
+          config.build_settings['OTHER_SWIFT_FLAGS'] << '-DCAMERA'
+      end
+  end
+
+  # Forces the minimum to be 9.0 as that's our last deployment targer, and new xcode build tools
+  # give an error in Xcode 10
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 9.0
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'
+      end
+    end
+  end
+end

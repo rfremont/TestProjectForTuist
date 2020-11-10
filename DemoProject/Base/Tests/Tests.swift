@@ -6,9 +6,9 @@
 //
 
 import XCTest
-@testable import appTest
+@testable import Demo2
 
-class appTestTests: XCTestCase {
+class AppTestTests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
