@@ -3,66 +3,54 @@ import Foundation
 
 extension Project {
 
-    public static func app(folder: String) -> Project {
+    public static func app(infosApp: InfoApp) -> Project {
 
-
-    let targetActions = [
-        TargetAction.pre(path: "Scripts/SwiftLintRunScript.sh",
-                        arguments: [],
-                        name: "SwiftLint"),
-
-        TargetAction.pre(path: "Scripts/RSwiftRunScript.sh",
-                        arguments: [],
-                        name: "R.Swift",
-                        inputPaths: [Path.init("$TEMP_DIR/rswift-lastrun")],
-                        inputFileListPaths: [],
-                        outputPaths: [Path.init("$SRCROOT/R.generated.swift")],
-                        outputFileListPaths: [])
-]
-
-
-        return Project(name: folder,
+        return Project(name: infosApp.appName,
                        organizationName: "MyCompany",
-        packages: [
-                .package(url: "https://github.com/DaveWoodCom/XCGLogger.git", .upToNextMajor(from: "7.0.1")),
-        ],
-        settings: Settings.init(configurations: [
-        .debug(name: "Debug DEV"),
-        .debug(name: "Debug ITG"),
-        .debug(name: "Debug PRP"),
-        .debug(name: "Debug PROD"),
-        .release(name: "Release DEV"),
-        .release(name: "Release ITG"),
-        .release(name: "Release PRP"),
-        .release(name: "Release PROD")
-    ]),
+                       packages: infosApp.appPackages(),
+                       settings: infosApp.appSettings(),
         targets: [
-        Target(name: folder,
+            Target(name: infosApp.appName,
                     platform: .iOS,
                     product: .app,
-                    bundleId: "com.demoapp",
-                    infoPlist: InfoPlist.file(path: "Base/Support/Info.plist"),
-                    sources: ["Base/Core/**","Base/Features/**","\(folder)/Sources/ViewController.swift"],
-                    resources: ["Base/Resources/**","\(folder)/Resources/**"],
-                    actions: targetActions,
-                    dependencies: [
-                        .package(product: "XCGLogger"),
-                        .cocoapods(path: ".")
-                   ]
+                    bundleId: infosApp.bundleId,
+                    deploymentTarget: .iOS(targetVersion: "11.0", devices: .iphone) ,
+                    infoPlist:infosApp.appInfoPlist(),
+                    sources: ["Base/Core/**","Base/Features/**","\(infosApp.folder)/Sources/ViewController.swift"],
+                    resources: ["Base/Resources/**","\(infosApp.folder)/Resources/**"],
+                    actions: toolTargetActions(),
+                    dependencies: infosApp.appTargetDependencies(),
+                    settings: infosApp.appSettings()
                     ),
-        Target(name: "\(folder)Tests",
+        Target(name: "\(infosApp.appName)Tests",
                     platform: .iOS,
                     product: .unitTests,
                     bundleId: "com.demoapptests",
                     infoPlist: "Base/Tests/Info.plist",
                     sources: ["Base/Tests/**"],
                     dependencies: [
-                        .target(name: folder)
+                        .target(name: infosApp.appName)
                    ]
                    )
         ],
-            additionalFiles: [
-                    "R.generated.swift"
-            ])
+        additionalFiles: infosApp.additionalFiles()
+        )
+    }
+    
+    
+    private static func toolTargetActions() -> [TargetAction] {
+         return [
+            TargetAction.pre(path: "Scripts/SwiftLintRunScript.sh",
+                            arguments: [],
+                            name: "SwiftLint"),
+
+            TargetAction.pre(path: "Scripts/RSwiftRunScript.sh",
+                            arguments: [],
+                            name: "R.Swift",
+                            inputPaths: [Path.init("$TEMP_DIR/rswift-lastrun")],
+                            inputFileListPaths: [],
+                            outputPaths: [Path.init("$SRCROOT/R.generated.swift")],
+                            outputFileListPaths: [])
+    ]
     }
 }

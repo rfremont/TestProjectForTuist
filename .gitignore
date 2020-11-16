@@ -1,3 +1,5 @@
 DemoProject/Pods/*
 DemoProject/R.generated.swift
 .DS_Store
+DemoProject/Podfile
+DemoProject/.swiftlint.yml
